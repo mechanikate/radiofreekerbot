@@ -37,13 +37,13 @@ class Album:
         parts_dict = search("{artist} - {album} [{label}, {year}]", formatted_string).named # get dict in format of curly brace'd placeholders mapped to matching strs
         return Album(parts_dict["artist"], parts_dict["album"], parts_dict["label"], parts_dict["year"])
 
-now_playing_album = Album("Interpol", "Turn On the Bright Lights", "Matador", 2002)
+now_playing_album = None
 current_album_ptr = 0
-queue = [now_playing_album]
+queue = []
 
 @app.route("/")
 def main_site():
-    return render_template("index.html", queue=queue, current=current_album_ptr, **now_playing_album.as_context())
+    return render_template("index.html", queue=queue, current=current_album_ptr, **(now_playing_album.as_context() if now_playing_album else {}))
 
 @app.route("/addSongToQueue", methods=["POST"])
 def add_song_endpoint():
@@ -100,22 +100,26 @@ def remove_index_endpoint():
         return jsonify({"result": f"success, new length of {len(queue)}"})
     return jsonify({"error": "something has gone terribly wrong"}), 400
 
-@app.route("/saveQueue", methods=["GET"])
-def save_queue_endpoint():
+def save_queue():
     with open("queue.json", "w+") as f:
         json.dump({
             "queue": [str(album) for album in queue],
             "index": current_album_ptr
         }, f)
-    return jsonify({"result": "successfully saved queue"})
-
-@app.route("/loadQueue", methods=["GET"])
-def load_queue_endpoint():
+def load_queue():
     global queue, current_album_ptr
     with open("queue.json", "r") as f:
         data_dict = json.load(f)
         current_album_ptr = data_dict["index"]
         queue = [Album.from_string(album) for album in data_dict["queue"]]
+@app.route("/saveQueue", methods=["GET"])
+def save_queue_endpoint():
+    save_queue()
+    return jsonify({"result": "successfully saved queue"})
+
+@app.route("/loadQueue", methods=["GET"])
+def load_queue_endpoint():
+    load_queue()
     return jsonify({"result": f"success, new queue length is {len(queue)}"})
 
 @app.route("/searchAlbum", methods=["POST"])
@@ -144,4 +148,5 @@ def search_album(query):
         elif hasattr(result, "title") and hasattr(result, "artists") and hasattr(result, "labels") and hasattr(result, "year"):
             results_data.append(str(Album(result.artists[0].name, result.title, result.labels[0].name, result.year)))
     return jsonify(list(dict.fromkeys(results_data))), 200 
+load_queue()
 app.run(port=8080)
