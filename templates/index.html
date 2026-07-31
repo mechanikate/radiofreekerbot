@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>RadioFreeKerBot</title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+		<script defer src="{{ url_for('static', filename='index.js') }}"></script>
+	</head>
+	<body>
+		<div class="screen">
+			<div class="now-playing group">
+				{% if now_playing_formatted %}
+				<h2 id="nowPlaying">Now Spinning: <span id="nowPlayingAlbum">{{ now_playing_formatted }}</span></h2>
+				{% else %}
+				<h2 id="nowPlaying">Now Spinning: <span id="nowPlayingAlbum">Nothing</span></h2>
+				{% endif %}
+				<i>status:</i> <span id="errorLog">all good</span> 
+			</div>
+			<div class="queue group">
+				<div class="queue-add subgroup">
+					<input id="queueSearch" type="text", placeholder="Search Discogs..." /><button id="queueSearchButton" onclick="updateSearchResults(document.getElementById('queueSearch').value);">?</button>
+					<input id="queueAddFromString" name="fromString" type="text" placeholder="Or, input manually..." /><button id="queueAddFromStringButton" onclick="addAlbumToQueue(document.getElementById('queueAddFromString').value);">+</button>
+					<div class="queue-results subgroup"> 
+						<ol id="searchResultContainer">
+						</ol>
+					</div>
+				</div>
+				<div class="queue-display subgroup">
+					<ol id="queueDisplayList"></ol>
+				</div>
+				<div class="queue-controls subgroup">
+					<button onclick="previousAlbum();">prev</button>
+					<button onclick="nextAlbum();">next</button>
+					&nbsp; <button onclick="saveQueue();">save queue</button> <button onclick="loadQueue();">load queue</button>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

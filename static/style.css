@@ -1,0 +1,114 @@
+body {
+	background-color: #050510;
+	color: #b9b9ff;
+	font-family: "Times New Roman", serif;
+}
+
+#nowPlaying {
+	font-weight: normal;
+}
+
+#nowPlayingAlbum, #queueNowPlaying {
+	font-weight: 900;
+}
+
+#nowPlayingAlbum {
+	font-style: italic;
+}
+
+input[type=text], #queueAddFromStringButton {
+	color: #b9b9ff;
+	border: 1px solid #b9b9ff;
+	font-family: "Times New Roman", serif;
+}
+input[type=text] {
+	background-color: transparent; 
+}
+#queueAddFromString {
+	grid-area: queue-input; 
+}
+#queueAddFromStringButton {
+	background-color: rgba(255,255,255,0.75);
+	width: 100%;
+	grid-area: queue-input-button; 
+	color: #050510; 
+}
+#queueSearch {
+	grid-area: queue-search;
+}
+#queueSearchButton {
+	grid-area: queue-search-button;
+}
+button {
+	border: 1px solid #b9b9ff;
+	font-family: "Times New Roman", serif;
+	background-color: rgba(255,255,255,0.75);
+	color: #050510; 
+}
+#queueDisplayList {
+	margin-top: 0;
+}
+
+.screen {  
+	margin: 1rem;
+	display: grid;
+	width: 95vw;
+	height: 95vh;
+	grid-template-columns: 0.25fr 0.75fr;
+	grid-template-rows: 0.3fr 1.8fr 1fr;
+	gap: 0px 0px;
+	grid-auto-flow: row;
+	grid-template-areas:
+	"now-playing now-playing"
+	"queue queue"
+	"queue queue";
+}
+
+.queue {  
+	border: 1px solid #b9b9ff;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: 1fr 1.8fr 0.2fr;
+	gap: 0px 0px;
+	grid-auto-flow: row;
+	grid-template-areas:
+	"queue-add queue-display"
+	"queue-add queue-display"
+	"queue-controls queue-display";
+	grid-area: queue;
+}
+
+.queue-add { 
+	display: grid;
+	grid-template-columns: 1fr 0.03fr;
+	grid-template-rows: 0.05fr 0.05fr 0.9fr;
+	grid-template-areas: "queue-search queue-search-button"
+	"queue-input queue-input-button";
+	"queue-results queue-results";
+	gap: 0px 0px;
+	grid-auto-flow: row;
+	border: 1px solid #b9b9ff;
+	margin: 1rem;
+	grid-area: queue-add; 
+}
+
+.queue-display { 
+	margin: 1rem;
+	border: 1px solid #b9b9ff;
+	grid-area: queue-display; 
+}
+
+.queue-controls { 
+	margin-left: 1rem;
+	grid-area: queue-controls; 
+}
+
+.now-playing { 
+	margin: 1rem;
+	grid-area: now-playing; 
+}
+.queue-removable-member, .results-removable-member {
+	width: 100%;
+	float: left;
+}
+
