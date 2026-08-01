@@ -71,8 +71,8 @@ function updateQueue() {
 			if(index == nowPlayingIdx) listEle.id = "queueNowPlaying";
 			listEle.classList.add("queue-removable-member");
 				
-			listEle.innerHTML = `${album.now_playing_artist} - ${album.now_playing_album}`;
-			listEle.setAttribute("title", `${album.now_playing_label}, ${album.now_playing_year}`);
+			listEle.innerHTML = `${album.now_playing_artist || ""}${album.now_playing_artist ? " - " : ""}${album.now_playing_album}`;
+			listEle.setAttribute("title", `${album.now_playing_label || ""}${album.now_playing_label ? ", " : ""}${album.now_playing_year || ""}`);
 
 			let removeIndexEle = document.createElement("button");
 

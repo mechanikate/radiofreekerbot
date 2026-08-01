@@ -15,12 +15,18 @@ class Album:
         self.year = str(year)
     
     def __str__(self): # str(album: Album) returns formatted string (that works with Album.from_string by the way)
+        if None in [self.artist, self.label, self.year]:
+            return self.album if self.album else ""
         return f"{self.artist} - {self.album} [{self.label}, {self.year}]"
     def as_full_str(self):
         return str(self)
     def as_brief_str(self):
+        if not self.artist:
+            return self.album
         return f"{self.artist} - {self.album}"
     def as_only_attributes_str(self):
+        if not self.label and not self.year:
+            return ""
         return f"{self.label}, {self.year}"
     def as_context(self):
         return {
@@ -34,8 +40,14 @@ class Album:
         }
     @staticmethod
     def from_string(formatted_string):
-        parts_dict = search("{artist} - {album} [{label}, {year}]", formatted_string).named # get dict in format of curly brace'd placeholders mapped to matching strs
+        try:
+            parts_dict = search("{artist} - {album} [{label}, {year}]", formatted_string).named # get dict in format of curly brace'd placeholders mapped to matching strs
+        except:
+            return Album.from_raw_string(formatted_string)
         return Album(parts_dict["artist"], parts_dict["album"], parts_dict["label"], parts_dict["year"])
+    @staticmethod
+    def from_raw_string(raw_string):
+        return Album(None, raw_string, None, None)
 
 now_playing_album = None
 current_album_ptr = 0
