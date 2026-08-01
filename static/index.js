@@ -93,5 +93,5 @@ function updateQueue() {
 
 			index++;
 		});
-	}).catch(err => document.getElementById("errorLog").innerHTML = e.message);
+	}).catch(err => document.getElementById("errorLog").innerHTML = err.message);
 }
