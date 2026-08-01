@@ -70,6 +70,7 @@ def add_song_endpoint():
     as_string = data.get("string")
     if as_string:
         queue.append(Album.from_string(as_string))
+        save_queue()
         return jsonify({"result": f"added song successfully at position {len(queue)}"}), 201
     return jsonify({"error": "something has gone terribly wrong"}), 400
 
@@ -86,6 +87,7 @@ def next_album_endpoint():
     if(current_album_ptr+1 >= len(queue)):
         return jsonify({"error": "out of queued albums"})
     current_album_ptr += 1
+    save_queue()
     return jsonify({"result": f"success, onto queue #{current_album_ptr+1}"})
     
 @app.route("/previous", methods=["GET","POST"])
@@ -94,6 +96,7 @@ def previous_album_endpoint():
     if(current_album_ptr <= 0):
         return jsonify({"error": "already at first queued album"})
     current_album_ptr -= 1
+    save_queue()
     return jsonify({"result": f"success, onto queue #{current_album_ptr+1}"})
 
 @app.route("/currentIndex", methods=["GET"])
@@ -116,6 +119,7 @@ def remove_index_endpoint():
         del queue[got_index]
         if(got_index >= len(queue)):
             current_album_ptr = len(queue)-1
+        save_queue()
         return jsonify({"result": f"success, new length of {len(queue)}"})
     return jsonify({"error": "something has gone terribly wrong"}), 400
 
@@ -130,6 +134,7 @@ def move_down_endpoint():
         queue.insert(got_index+1, val)
     else:
         return jsonify({"error": "invalid index"}), 415 # 415 = unsupported media type
+    save_queue()
     return jsonify({"result": "success"})
 
 @app.route("/moveUp", methods=["POST"])
@@ -143,6 +148,7 @@ def move_up_endpoint():
         queue.insert(got_index-1, val)
     else:
         return jsonify({"error": "invalid index"}), 415 # 415 = unsupported media type
+    save_queue()
     return jsonify({"result": "success"})
 def save_queue():
     with open("queue.json", "w+") as f:
