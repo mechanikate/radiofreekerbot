@@ -67,7 +67,10 @@ function updateQueue() {
 	
 		j.forEach((album, index) => {
 			let listEle = document.createElement("li");
-
+			
+			let rightSide = document.createElement("span");
+			rightSide.style.float = "right";
+			
 			if(index == nowPlayingIdx) listEle.id = "queueNowPlaying";
 			listEle.classList.add("queue-removable-member");
 				
@@ -75,9 +78,12 @@ function updateQueue() {
 			listEle.setAttribute("title", `${album.now_playing_label || ""}${album.now_playing_label ? ", " : ""}${album.now_playing_year || ""}`);
 
 			let removeIndexEle = document.createElement("button");
+			let moveUpEle = document.createElement("button");
+			let moveDownEle = document.createElement("button");
 
+			moveUpEle.innerHTML = "&uarr;";
+			moveDownEle.innerHTML = "&darr;";
 			removeIndexEle.innerHTML = "x";
-			removeIndexEle.style.float = "right";
 			removeIndexEle.addEventListener("click", () => {
 				fetch("./removeIndex", {
 					method: "POST",
@@ -88,7 +94,31 @@ function updateQueue() {
 				}).then(r => r.json()).then(r => r.error ? (document.getElementById("errorLog").innerHTML = r.error) : updateQueue()); 
 			});
 
-			listEle.appendChild(removeIndexEle);
+			moveUpEle.addEventListener("click", () => {
+				fetch("./moveUp", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify({index: index-1})
+				}).then(r => r.json()).then(r => r.error ? (document.getElementById("errorLog").innerHTML = r.error) : updateQueue()); 
+			});
+			moveDownEle.addEventListener("click", () => {
+				fetch("./moveDown", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify({index: index-1})
+				}).then(r => r.json()).then(r => r.error ? (document.getElementById("errorLog").innerHTML = r.error) : updateQueue()); 
+			});
+
+
+
+			rightSide.appendChild(moveUpEle);
+			rightSide.appendChild(moveDownEle);
+			rightSide.appendChild(removeIndexEle);
+			listEle.appendChild(rightSide);
 			document.getElementById("queueDisplayList").appendChild(listEle);
 
 			index++;

@@ -1,7 +1,7 @@
 import discogs_client, json, os, sys
 from parse import * # inverse of format/fstrings for parsing old format
 
-from flask import Flask, jsonify, render_template, request # local webapp stuff
+from flask import Flask, jsonify, make_response, render_template, request # local webapp stuff
 app = Flask(__name__)
 
 discogs = discogs_client.Client("RFKBot/0.1", user_token=os.environ["DISCOGS_USERTOKEN"])
@@ -53,6 +53,11 @@ now_playing_album = None
 current_album_ptr = 0
 queue = []
 
+def respond_plaintext(text):
+    response = make_response(text, 200)
+    response.mimetype = "text/plain"
+    return response
+
 @app.route("/")
 def main_site():
     return render_template("index.html", queue=queue, current=current_album_ptr, **(now_playing_album.as_context() if now_playing_album else {}))
@@ -99,7 +104,7 @@ def current_index_endpoint():
 def current_playing_endpoint():
     if len(queue) <= 0:
         return jsonify("Nothing"), 400
-    return jsonify(str(queue[current_album_ptr]))
+    return respond_plaintext(str(queue[current_album_ptr]))
 
 @app.route("/removeIndex", methods=["POST"])
 def remove_index_endpoint():
@@ -109,9 +114,36 @@ def remove_index_endpoint():
     got_index = data.get("index")
     if isinstance(got_index,int) and got_index >= 0 and got_index < len(queue):
         del queue[got_index]
+        if(got_index >= len(queue)):
+            current_album_ptr = len(queue)-1
         return jsonify({"result": f"success, new length of {len(queue)}"})
     return jsonify({"error": "something has gone terribly wrong"}), 400
 
+@app.route("/moveDown", methods=["POST"])
+def move_down_endpoint():
+    if not request.is_json:
+        return jsonify({"error": "expected json with 'index' key"}), 415 # 415 = unsupported media type
+    data = request.get_json()
+    got_index = data.get("index")
+    if isinstance(got_index,int) and got_index >= 0 and got_index < len(queue)-1:
+        val = queue.pop(got_index)
+        queue.insert(got_index+1, val)
+    else:
+        return jsonify({"error": "invalid index"}), 415 # 415 = unsupported media type
+    return jsonify({"result": "success"})
+
+@app.route("/moveUp", methods=["POST"])
+def move_up_endpoint():
+    if not request.is_json:
+        return jsonify({"error": "expected json with 'index' key"}), 415 # 415 = unsupported media type
+    data = request.get_json()
+    got_index = data.get("index")
+    if isinstance(got_index,int) and got_index >= 1:
+        val = queue.pop(got_index)
+        queue.insert(got_index-1, val)
+    else:
+        return jsonify({"error": "invalid index"}), 415 # 415 = unsupported media type
+    return jsonify({"result": "success"})
 def save_queue():
     with open("queue.json", "w+") as f:
         json.dump({
