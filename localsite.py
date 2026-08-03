@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 discogs = discogs_client.Client("RFKBot/0.1", user_token=os.environ["DISCOGS_USERTOKEN"])
 
-max_search_results = 10 # page size for Discogs searches, and thus max results for album search feature. higher number = more results => longer load time, be warned
+max_search_results = 6 # page size for Discogs searches, and thus max results for album search feature. higher number = more results => longer load time, be warned
 
 class Album:
     def __init__(self, artist, album, label, year):
@@ -186,7 +186,8 @@ def search_album_endpoint(): # use Discogs API to get an album by its approximat
             return search_album(query)
         except json.JSONDecodeError: 
             continue
-        except:
+        except Exception as e:
+            print(e, file=sys.stderr)
             return jsonify({"error": "discogs or the api wrapper is having issues right now"}), 400
     return jsonify({"error": "discogs or the api wrapper is having issues right now"}), 400
 def search_album(query): # Discogs API manager, see search_album_endpoint route
