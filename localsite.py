@@ -152,6 +152,7 @@ def move_up_endpoint():
     save_queue()
     return jsonify({"result": "success"})
 def save_queue(): # store the current queue and currently playing pointer/index marker to file at path "./queue.json"
+        
     with open("queue.json", "w+") as f:
         json.dump({
             "queue": [str(album) for album in queue],
@@ -159,6 +160,10 @@ def save_queue(): # store the current queue and currently playing pointer/index 
         }, f)
 def load_queue(): # load queue and play position from file at path "./queue.json"
     global queue, current_album_ptr
+    if not os.path.isfile("queue.json"):
+        current_album_ptr = 0
+        queue = []
+        return
     with open("queue.json", "r") as f:
         data_dict = json.load(f)
         current_album_ptr = data_dict["index"]
